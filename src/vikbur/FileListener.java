@@ -1,6 +1,7 @@
 package vikbur;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Date;
 
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -10,16 +11,28 @@ import org.apache.commons.io.monitor.FileAlterationObserver;
 
 public class FileListener {
 
+    private static long countLines;
+
     public static void main(String[] args) {
 
+        initNode();
         startListener();
-    
+
+    }
+
+    private static void initNode(){
+        Node node = new Node();
+        node.run();
     }
 
     private static void startListener(){
 
         try {
             File file = new File("D://ForJava//files//test1.txt");
+
+            //записываем текущее количество строк, чтобы понимать с какой строки записывать изменения
+
+            countLines = Files.lines(file.toPath()).count();
 
             File dir = file.getParentFile();
 
