@@ -20,11 +20,11 @@ public class Node extends Thread{
     @Override
     public void run() {
         //иммитируем постоянно работающий узел
-        System.out.println("Node started");
+        //System.out.println("Node started");
 
         while (isActive) {
             try {
-                Thread.sleep(5000);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 System.out.println("Node stopped");
                 break;
@@ -33,6 +33,7 @@ public class Node extends Thread{
 
     }
 
+    //добавляем новые события
     public static void updateEvents(List<String> newEvents){
 
         for (String newEvent: newEvents){
@@ -42,8 +43,16 @@ public class Node extends Thread{
         }
     }
 
+    //возвращаем текущие данные лога
     public static String getLog(){
-        return events.toString();
+
+        StringBuilder sb = new StringBuilder();
+
+        for (String str: events) {
+            sb.append(str).append("\n");
+        }
+
+        return sb.toString();
     }
 
 

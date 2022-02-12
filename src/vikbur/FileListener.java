@@ -3,7 +3,6 @@ package vikbur;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.Locale;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -12,19 +11,35 @@ import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 
+//основной класс
+//выполняет мониторинг файла, записывает изменения в Node, обеспечивает вывод лога при запросе
 public class FileListener {
 
+    private static final String fileName = "D://ForJava//files//test1.txt";
+    private static File file = new File(fileName);
     private static long countLines;
     private static FileAlterationMonitor monitor;
     private static Node node;
+    private static Loginer loginer;
     private static final String FILE_READ_ERROR = "File read error";
     private static final String CMD_MENU = "Enter getLog or exit";
     private static final String UNKNOWN_COMMAND = "Unknown command";
 
     public static void main(String[] args) {
 
+        try {
+            if (!file.exists()){
+                Files.createFile(file.toPath());
+            }
+        } catch (IOException e) {
+            System.out.println("File create error");
+            e.printStackTrace();
+            return;
+        }
+
         initNode();
         startListener();
+        startLoginer();
 
         try (Scanner console = new Scanner(System.in)){
 
@@ -32,6 +47,7 @@ public class FileListener {
 
             String cmd;
 
+            //ожидаем от пользоваля команду на выход или на вывод лога
             while (!(cmd = console.next()).toLowerCase().equals("exit")){
 
                 if (cmd.toLowerCase().equals("getlog")){
@@ -43,6 +59,7 @@ public class FileListener {
                 System.out.println(CMD_MENU);
             }
 
+            loginer.disable();
             node.disable();
             monitor.stop();
 
@@ -57,11 +74,13 @@ public class FileListener {
         node.start();
     }
 
+    private static void startLoginer(){
+        loginer = new Loginer(file);
+        loginer.start();
+    }
     private static void startListener(){
 
         try {
-            File file = new File("D://ForJava//files//test1.txt");
-
             //записываем текущее количество строк, чтобы понимать с какой строки записывать изменения
 
             countLines = Files.lines(file.toPath()).count();
