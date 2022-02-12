@@ -16,8 +16,8 @@ import org.apache.commons.io.monitor.FileAlterationObserver;
 public class FileListener {
 
     //private static final String fileName = "D://ForJava//files//test1.txt";
-    private static final String fileName = "//var//log//auth.log";
-    private static File file = new File(fileName);
+    private static String fileName; //"//var//log//auth.log";
+    private static File file;
     private static long countLines;
     private static FileAlterationMonitor monitor;
     private static Node node;
@@ -27,6 +27,14 @@ public class FileListener {
     private static final String UNKNOWN_COMMAND = "Unknown command";
 
     public static void main(String[] args) {
+
+        if (args.length != 1) {
+            System.out.println("Run with fileName param");
+            return;
+        }
+
+        fileName = args[0];
+        file = new File(fileName);
 
         try {
             if (!file.exists()){
@@ -49,7 +57,7 @@ public class FileListener {
             String cmd;
 
             //ожидаем от пользоваля команду на выход или на вывод лога
-            while (!(cmd = console.next()).toLowerCase().equals("exit")){
+            while (!(cmd = console.nextLine()).toLowerCase().equals("exit")){
 
                 if (cmd.toLowerCase().equals("getlog")){
                     System.out.println(Node.getLog());
@@ -60,12 +68,18 @@ public class FileListener {
                 System.out.println(CMD_MENU);
             }
 
-            loginer.disable();
-            node.disable();
-            monitor.stop();
-
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+
+            loginer.disable();
+            node.disable();
+
+            try {
+                monitor.stop();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }
