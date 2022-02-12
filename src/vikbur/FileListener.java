@@ -1,8 +1,10 @@
 package vikbur;
 
-import java.io.File;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
@@ -12,6 +14,9 @@ import org.apache.commons.io.monitor.FileAlterationObserver;
 public class FileListener {
 
     private static long countLines;
+    private static FileAlterationMonitor monitor;
+    private static Node node;
+    private static final String FILE_READ_ERROR = "File read error";
 
     public static void main(String[] args) {
 
@@ -21,7 +26,7 @@ public class FileListener {
     }
 
     private static void initNode(){
-        Node node = new Node();
+        node = new Node();
         node.run();
     }
 
@@ -45,12 +50,29 @@ public class FileListener {
             observer.addListener(new FileAlterationListenerAdaptor(){
                 @Override
                 public void onFileChange(File file) {
-                    System.out.println(file.getPath().toString() + " change at " + new Date());
+
+                    try {
+
+                        List<String> lines = Files.readAllLines(file.toPath());
+
+                        if (countLines == 0){
+                            Node.updateEvents(lines);
+                        } else {
+                            Node.updateEvents(lines.stream().filter(x -> lines.indexOf(x) > countLines).collect(Collectors.toList()));
+                        }
+
+                        countLines = lines.size();
+
+                    } catch (IOException e) {
+                        System.out.println(FILE_READ_ERROR);
+                        e.printStackTrace();
+                    }
+
                 }
             });
 
             //Запускаем мониторинг файла с интервалом в 5 сек
-            FileAlterationMonitor monitor = new FileAlterationMonitor(5000, observer);
+            monitor = new FileAlterationMonitor(5000, observer);
             monitor.start();
 
         } catch (Exception e) {

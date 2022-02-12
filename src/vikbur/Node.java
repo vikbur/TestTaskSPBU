@@ -1,9 +1,7 @@
 package vikbur;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Node implements Runnable{
 
@@ -11,13 +9,28 @@ public class Node implements Runnable{
 
     @Override
     public void run() {
+        //иммитируем постоянно работающий узел
+        System.out.println("Node started");
 
-        try {
-            System.out.println("I'm Node, i'm alive! :)");
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            System.out.println("Node stopped");
+        while (true) {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                System.out.println("Node stopped");
+                break;
+            }
         }
 
     }
+
+    public static void updateEvents(List<String> newEvents){
+
+        for (String newEvent: newEvents){
+            if (!events.contains(newEvent)){
+                events.add(newEvent);
+            }
+        }
+    }
+
+
 }
