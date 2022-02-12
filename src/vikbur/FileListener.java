@@ -15,7 +15,8 @@ import org.apache.commons.io.monitor.FileAlterationObserver;
 //выполняет мониторинг файла, записывает изменения в Node, обеспечивает вывод лога при запросе
 public class FileListener {
 
-    private static final String fileName = "D://ForJava//files//test1.txt";
+    //private static final String fileName = "D://ForJava//files//test1.txt";
+    private static final String fileName = "//var//log//auth.log";
     private static File file = new File(fileName);
     private static long countLines;
     private static FileAlterationMonitor monitor;
