@@ -2,8 +2,9 @@ package vikbur;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -17,17 +18,43 @@ public class FileListener {
     private static FileAlterationMonitor monitor;
     private static Node node;
     private static final String FILE_READ_ERROR = "File read error";
+    private static final String CMD_MENU = "Enter getLog or exit";
+    private static final String UNKNOWN_COMMAND = "Unknown command";
 
     public static void main(String[] args) {
 
         initNode();
         startListener();
 
+        try (Scanner console = new Scanner(System.in)){
+
+            System.out.println(CMD_MENU);
+
+            String cmd;
+
+            while (!(cmd = console.next()).toLowerCase().equals("exit")){
+
+                if (cmd.toLowerCase().equals("getlog")){
+                    System.out.println(Node.getLog());
+                } else {
+                    System.out.println(UNKNOWN_COMMAND);
+                }
+
+                System.out.println(CMD_MENU);
+            }
+
+            node.disable();
+            monitor.stop();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     private static void initNode(){
         node = new Node();
-        node.run();
+        node.start();
     }
 
     private static void startListener(){
@@ -54,6 +81,9 @@ public class FileListener {
                     try {
 
                         List<String> lines = Files.readAllLines(file.toPath());
+
+                        //обновляем данные в Node, если изначально файл был пустой, то отправляем все строки
+                        //если нет, то только новые строки
 
                         if (countLines == 0){
                             Node.updateEvents(lines);
